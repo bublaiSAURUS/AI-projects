@@ -31,6 +31,9 @@ public class AlphaBetaMoveChooser extends MoveChooser {
         // Add alpha-beta pruning code...
         Move ans= null;
         int optimum = Integer.MIN_VALUE;
+
+        int alpha = Integer.MIN_VALUE;
+        int beta = Integer.MAX_VALUE;
         //int bestVal = Max(boardState,Integer.MIN_VALUE, Integer.MAX_VALUE,this.searchDepth);
         ArrayList<Move> legalMoves = boardState.getLegalMoves();
         for(int i = 0; i<legalMoves.size(); i++)
@@ -38,12 +41,17 @@ public class AlphaBetaMoveChooser extends MoveChooser {
             Move a = legalMoves.get(i);
             BoardState b = boardState.deepCopy();
             b.makeLegalMove(a);
-            int h = Min(b, Integer.MIN_VALUE, Integer.MAX_VALUE, this.searchDepth-1);
+            int h = Min(b, alpha, beta, this.searchDepth-1);
             if (h>optimum)
             {
                 optimum = h;
-                //System.out.println(optimum);
+                System.out.println(optimum);
                 ans = a;
+            }
+            alpha = Math.max(alpha, optimum);
+            if (alpha >= beta) 
+            {
+                break;
             }
         }
         //System.out.println(optimum); 
@@ -66,11 +74,11 @@ public class AlphaBetaMoveChooser extends MoveChooser {
             b1.makeLegalMove(lM.get(i));
             int v = Min(b1, alpha, beta, depth-1);
             m = Math.max(m,v);
-            if(m>=beta){
-                //System.out.println("Pruning");
-            return m;
-            }
             alpha = Math.max(alpha,m);
+            if(alpha>=beta){
+                //System.out.println("Pruning");
+            break;
+            }
         }
         return m;
     }
@@ -91,11 +99,11 @@ public class AlphaBetaMoveChooser extends MoveChooser {
             b1.makeLegalMove(lM.get(i));
             int v = Max(b1, alpha, beta, depth-1);
             m = Math.min(m,v);
-            if(m<=alpha){
-            //System.out.println("Pruning");
-            return m;
-            }
             beta = Math.min(m,beta);
+            if(alpha>=beta){
+            //System.out.println("Pruning");
+            break;
+            }
         }
         return m;
     }
