@@ -74,11 +74,11 @@ public class AlphaBetaMoveChooser extends MoveChooser {
             b1.makeLegalMove(lM.get(i));
             int v = Min(b1, alpha, beta, depth-1);
             m = Math.max(m,v);
-            alpha = Math.max(alpha,m);
-            if(alpha>=beta){
+            if(m>=beta){
                 //System.out.println("Pruning");
-            break;
+            return m;
             }
+            alpha = Math.max(alpha,m);
         }
         return m;
     }
@@ -99,11 +99,11 @@ public class AlphaBetaMoveChooser extends MoveChooser {
             b1.makeLegalMove(lM.get(i));
             int v = Max(b1, alpha, beta, depth-1);
             m = Math.min(m,v);
-            beta = Math.min(m,beta);
-            if(alpha>=beta){
+            if(alpha>=m){
             //System.out.println("Pruning");
-            break;
+            return m;
             }
+            beta = Math.min(m,beta);
         }
         return m;
     }
