@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Solution code for Comp24011 Reversi lab
@@ -12,10 +14,25 @@ public class AlphaBetaMoveChooser extends MoveChooser {
      *
      * @param   searchDepth The requested depth for minimax search
      */
+
+     private class tableNode
+     {
+        protected int score;
+        protected int depth;
+        protected int type; // 0 is exact, 1 is upper bound and -1 is lower bound
+        public tableNode(int score, int depth, int type){
+            this.score = score;
+            this.depth = depth;
+            this.type = type;
+        }
+    }
+    private Map<Integer,tableNode> transpositionTable;
     public AlphaBetaMoveChooser(int searchDepth) {
         // Add object initialisation code...
         super("MyAwesomeAgent",searchDepth);
+        transpositionTable = new HashMap<>();
     }
+
 
     /**
      * Need to implement chooseMove(BoardState,Move)
@@ -60,10 +77,44 @@ public class AlphaBetaMoveChooser extends MoveChooser {
 
     private int Max(BoardState b, int alpha, int beta, int depth) 
     {
+        int hash = b.hashCode();
+        if(transpositionTable.containsKey(hash) && transpositionTable.get(hash).depth>depth)
+        {
+            int value = transpositionTable.get(hash).score;
+            if(transpositionTable.get(hash).type == 0)
+            {
+                return value;
+            }
+            else if (transpositionTable.get(hash).type >0 && value <= alpha)
+            {
+                return value;
+            }
+            else if (transpositionTable.get(hash).type <0 && value >= beta)
+            {
+                return value;
+            }
+            else if (alpha >= beta)
+            {
+                return value;
+            }
+        }
+        
         if (b.gameOver() || depth == 0)
         {
             int k = boardEval(b);
             //System.out.println(k);
+            if(k <= alpha)
+            {
+            transpositionTable.put(hash, new tableNode(k, depth, 1));
+            }
+            else if(k >= beta)
+            {
+            transpositionTable.put(hash, new tableNode(k, depth, -1));
+            }
+            else
+            {
+                transpositionTable.put(hash, new tableNode(k, depth,0));
+            }
             return (k);
         }
         int m = Integer.MIN_VALUE;
@@ -74,9 +125,10 @@ public class AlphaBetaMoveChooser extends MoveChooser {
             b1.makeLegalMove(lM.get(i));
             int v = Min(b1, alpha, beta, depth-1);
             m = Math.max(m,v);
-            if(m>=beta){
+            if(m>=beta)
+            {
                 //System.out.println("Pruning");
-            return m;
+                return m;
             }
             alpha = Math.max(alpha,m);
         }
@@ -85,10 +137,43 @@ public class AlphaBetaMoveChooser extends MoveChooser {
 
     private int Min(BoardState b, int alpha, int beta, int depth) 
     {
+        int hash = b.hashCode();
+        if(transpositionTable.containsKey(hash) && transpositionTable.get(hash).depth>depth)
+        {
+            int value = transpositionTable.get(hash).score;
+            if(transpositionTable.get(hash).type == 0)
+            {
+                return value;
+            }
+            else if (transpositionTable.get(hash).type >0 && value <= alpha)
+            {
+                return value;
+            }
+            else if (transpositionTable.get(hash).type <0 && value >= beta)
+            {
+                return value;
+            }
+            else if (alpha >= beta)
+            {
+                return value;
+            }
+        }
         if (b.gameOver() || depth == 0)
         {
             int k = boardEval(b);
             //System.out.println(k);
+            if(k <= alpha)
+            {
+            transpositionTable.put(hash, new tableNode(k, depth, 1));
+            }
+            else if(k >= beta)
+            {
+            transpositionTable.put(hash, new tableNode(k, depth, -1));
+            }
+            else
+            {
+                transpositionTable.put(hash, new tableNode(k, depth,0));
+            }
             return (k);
         }
         int m = Integer.MAX_VALUE;
@@ -99,9 +184,10 @@ public class AlphaBetaMoveChooser extends MoveChooser {
             b1.makeLegalMove(lM.get(i));
             int v = Max(b1, alpha, beta, depth-1);
             m = Math.min(m,v);
-            if(alpha>=m){
+            if(alpha>=m)
+            {
             //System.out.println("Pruning");
-            return m;
+                return m;
             }
             beta = Math.min(m,beta);
         }
