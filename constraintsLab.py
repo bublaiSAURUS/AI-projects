@@ -59,19 +59,90 @@ def addPairList(problem,person, specs, time_List):
   
 # Task 2
 def CommonSum(n):
-  return 0
-
+  sum = (((n**2)+1)*(n**2))//(2*n)
+  return sum
 
 from constraint import *
 # Task 3
 def MSquares(n, pairList):
-  return constraint.Problem().getSolutions()
+  problem = Problem()
+  problem.addVariables(range(0, n**2), range(1, n**2 + 1))
+  problem.addConstraint(AllDifferentConstraint(), range(0, n**2))
+  problem.addConstraint(ExactSumConstraint(CommonSum(n)), [(n+1)*i for i in range(0, n)])
+  problem.addConstraint(ExactSumConstraint(CommonSum(n)), [(n-1)*i for i in range(1,n+1)])
+  for i in range(len(pairList)):
+    pos = pairList[i][0]
+    val = pairList[i][1]
+    problem.addConstraint(ExactSumConstraint(val),[pos])
+  for row in range(n):
+    problem.addConstraint(ExactSumConstraint(CommonSum(n)),[row * n + i for i in range(n)])
+  for col in range(n):
+    problem.addConstraint(ExactSumConstraint(CommonSum(n)),[col + n * i for i in range(n)])
+  return problem.getSolutions()
 
 
 # Task 4
 def PMSquares(n, pairList):
-  return constraint.Problem().getSolutions()
+  problem = Problem()
+  problem.addVariables(range(0, n**2), range(1, n**2 + 1))
+  problem.addConstraint(AllDifferentConstraint(), range(0, n**2))
+  left_List = left(n)
+  for i in range(len(left_List)):
+    problem.addConstraint(ExactSumConstraint(CommonSum(n)),left_List[i])
+  right_List = right(n)
+  for i in range(len(right_List)):
+    problem.addConstraint(ExactSumConstraint(CommonSum(n)),right_List[i])
+  for i in range(len(pairList)):
+    pos = pairList[i][0]
+    val = pairList[i][1]
+    problem.addConstraint(ExactSumConstraint(val),[pos])
+  for row in range(n):
+    problem.addConstraint(ExactSumConstraint(CommonSum(n)),[row * n + i for i in range(n)])
+  for col in range(n):
+    problem.addConstraint(ExactSumConstraint(CommonSum(n)),[col + n * i for i in range(n)])
+  return problem.getSolutions()
 
+def left(n):
+  big_List = []
+  constant_factor = n*(n-1)
+  decrement_step = n-1
+  for i in range(0, constant_factor+1, n):
+    counter = 0
+    l = []
+    a = i
+    while counter != n:
+      if(a>=0 and a - decrement_step>=0):
+        l.append(a)
+        a = a - decrement_step
+        counter = counter + 1
+      elif(a>=0 and a - decrement_step <0):
+        l.append(a)
+        a = constant_factor+a+1
+        counter = counter + 1
+    big_List.append(l)
+  return (big_List)
+
+def right(n):
+  big_List = []
+  constant_factor = n*(n-1)
+  decrement_step = n+1
+  for i in range(n-1, (n+1)*(n-1)+1, n):
+    counter = 0
+    l = []
+    a = i
+    while counter != n:
+      if(a>=0 and a - decrement_step>=0):
+        l.append(a)
+        a = a - decrement_step
+        counter = counter + 1
+      elif(a>=0 and a - decrement_step <0):
+        l.append(a)
+        a = constant_factor+a-1
+        counter = counter + 1
+    big_List.append(l)
+  return(big_List)
+  
+  return big_List
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # debug run
