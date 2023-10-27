@@ -68,16 +68,17 @@ def MSquares(n, pairList):
   problem = Problem()
   problem.addVariables(range(0, n**2), range(1, n**2 + 1))
   problem.addConstraint(AllDifferentConstraint(), range(0, n**2))
-  problem.addConstraint(ExactSumConstraint(CommonSum(n)), [(n+1)*i for i in range(0, n)])
-  problem.addConstraint(ExactSumConstraint(CommonSum(n)), [(n-1)*i for i in range(1,n+1)])
+  common_sum = CommonSum(n)
+  problem.addConstraint(ExactSumConstraint(common_sum), [(n+1)*i for i in range(0, n)])
+  problem.addConstraint(ExactSumConstraint(common_sum), [(n-1)*i for i in range(1,n+1)])
   for i in range(len(pairList)):
     pos = pairList[i][0]
     val = pairList[i][1]
     problem.addConstraint(ExactSumConstraint(val),[pos])
   for row in range(n):
-    problem.addConstraint(ExactSumConstraint(CommonSum(n)),[row * n + i for i in range(n)])
+    problem.addConstraint(ExactSumConstraint(common_sum),[row * n + i for i in range(n)])
   for col in range(n):
-    problem.addConstraint(ExactSumConstraint(CommonSum(n)),[col + n * i for i in range(n)])
+    problem.addConstraint(ExactSumConstraint(common_sum),[col + n * i for i in range(n)])
   return problem.getSolutions()
 
 
@@ -86,20 +87,22 @@ def PMSquares(n, pairList):
   problem = Problem()
   problem.addVariables(range(0, n**2), range(1, n**2 + 1))
   problem.addConstraint(AllDifferentConstraint(), range(0, n**2))
+  common_sum = CommonSum(n)
   left_List = left(n)
   for i in range(len(left_List)):
-    problem.addConstraint(ExactSumConstraint(CommonSum(n)),left_List[i])
+    problem.addConstraint(ExactSumConstraint(common_sum),left_List[i])
   right_List = right(n)
   for i in range(len(right_List)):
-    problem.addConstraint(ExactSumConstraint(CommonSum(n)),right_List[i])
+    problem.addConstraint(ExactSumConstraint(common_sum),right_List[i])
+  #Adding Pairlist
   for i in range(len(pairList)):
     pos = pairList[i][0]
     val = pairList[i][1]
     problem.addConstraint(ExactSumConstraint(val),[pos])
   for row in range(n):
-    problem.addConstraint(ExactSumConstraint(CommonSum(n)),[row * n + i for i in range(n)])
+    problem.addConstraint(ExactSumConstraint(common_sum),[row * n + i for i in range(n)])
   for col in range(n):
-    problem.addConstraint(ExactSumConstraint(CommonSum(n)),[col + n * i for i in range(n)])
+    problem.addConstraint(ExactSumConstraint(common_sum),[col + n * i for i in range(n)])
   return problem.getSolutions()
 
 def left(n):
