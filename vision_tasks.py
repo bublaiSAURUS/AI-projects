@@ -33,8 +33,21 @@ class VisionTasks(VisionTasksBase):
         :return: matches for descriptors
         :rtype:  list
         """
-        return []
+        best_match = []
+        best_keypoint = []
+        bf = cv2.BFMatcher()
+        matches = bf.knnMatch(des1, des2, k = 100)
+        for match in matches:
+            for m in match:
+                dist_value = m.distance
+                if dist_value <= threshold:
+                    best_keypoint.append(m)
+            best_match.append(best_keypoint)
+            best_keypoint = []
+        return best_match
 
+
+    #TODO:Note that for >threshold, it is giving error
     def nn(self, des1, des2, threshold=None):
         """Implements feature matching based on nearest neighbour
 
@@ -48,8 +61,26 @@ class VisionTasks(VisionTasksBase):
         :return: matches for descriptors
         :rtype:  list
         """
-        return []
+        best_match = []
+        best_keypoint = []
+        bf = cv2.BFMatcher()
+        matches = bf.knnMatch(des1, des2, k = 100)
+        for match in matches:
+            f = 1.7976931348623157e+308
+            a = None
+            for m in match:
+                dist_value = m.distance
+                if dist_value < f:
+                    f = dist_value
+                    a = m
+            if threshold == None or (threshold!= None and a.distance <= threshold):
+                best_keypoint.append(a)
+            best_match.append(best_keypoint)
+            best_keypoint = []
+        return best_match
 
+
+    #Ambiguous
     def nndr(self, des1, des2, threshold):
         """Implements feature matching based on nearest neighbour distance ratio
 
@@ -63,7 +94,18 @@ class VisionTasks(VisionTasksBase):
         :return: matches for descriptors
         :rtype:  list
         """
-        return []
+        best_match = []
+        best_keypoint = []
+        bf = cv2.BFMatcher()
+        matches = bf.knnMatch(des1, des2, k = 100)
+        for match in matches:
+            feature_1 = match[0]
+            feature_2 = match[99]
+            if feature_1.distance <= feature_2.distance*threshold:
+                best_keypoint.append(feature_1)
+            best_match.append(best_keypoint)
+            best_keypoint = []
+        return best_match
 
     def matching_info(self, kp1, kp2, feature_matches):
         """Collects information about the matches of some feature
@@ -80,7 +122,32 @@ class VisionTasks(VisionTasksBase):
                  distances for feature matches in current image
         :rtype:  tuple, list, list
         """
-        return (0,0), [], []
+        #print('Feature Matches looks like:')
+        #print(feature_matches)
+        #print('Length of feature_matches = '+ str(len(feature_matches)))
+        if feature_matches == []:
+            #print('No empty list allowed')
+            return (0,0), [], []
+        query_kp_index = feature_matches[0].queryIdx
+        query_kp = kp1[query_kp_index]
+        x_coord_query_kp = int(query_kp.pt[0])
+        y_coord_query_kp = int(query_kp.pt[1])
+
+        ref_coord_list = []
+        ref_dist_list = []
+        for feature in feature_matches:
+            
+            ref_dist_list.append(feature.distance)
+            ref_kp_index = feature.trainIdx
+            ref_kp = kp2[ref_kp_index]
+
+            x_coord_ref_kp = int(ref_kp.pt[0])
+            y_coord_ref_kp = int(ref_kp.pt[1])
+
+            ref_coord_list.append((x_coord_ref_kp, y_coord_ref_kp))
+
+
+        return (x_coord_query_kp,y_coord_query_kp), ref_coord_list, ref_dist_list
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
