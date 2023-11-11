@@ -97,10 +97,10 @@ class VisionTasks(VisionTasksBase):
         best_match = []
         best_keypoint = []
         bf = cv2.BFMatcher()
-        matches = bf.knnMatch(des1, des2, k = 100)
+        matches = bf.knnMatch(des1, des2, k = 2)
         for match in matches:
             feature_1 = match[0]
-            feature_2 = match[99]
+            feature_2 = match[1]
             if feature_1.distance <= feature_2.distance*threshold:
                 best_keypoint.append(feature_1)
             best_match.append(best_keypoint)
