@@ -11,7 +11,7 @@ __author__ = "USERNAME"
 import cv2
 import sys
 
-from vision_tasks_base import VisionTasksBase
+from vision_tasks_base import VisionTasksBase, NUM_FEATURES
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -36,7 +36,7 @@ class VisionTasks(VisionTasksBase):
         best_match = []
         best_keypoint = []
         bf = cv2.BFMatcher()
-        matches = bf.knnMatch(des1, des2, k = 1500)
+        matches = bf.knnMatch(des1, des2, k = NUM_FEATURES)
         for match in matches:
             for m in match:
                 dist_value = m.distance
