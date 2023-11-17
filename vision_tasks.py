@@ -73,7 +73,7 @@ class VisionTasks(VisionTasksBase):
                 if dist_value < f:
                     f = dist_value
                     a = m
-            if threshold == None or (threshold!= None and a.distance <= threshold):
+            if threshold == None or (threshold!= None and a.distance < threshold):
                 best_keypoint.append(a)
             best_match.append(best_keypoint)
             best_keypoint = []
