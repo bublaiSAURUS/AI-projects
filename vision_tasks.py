@@ -36,7 +36,7 @@ class VisionTasks(VisionTasksBase):
         best_match = []
         best_keypoint = []
         bf = cv2.BFMatcher()
-        matches = bf.knnMatch(des1, des2, k = 100)
+        matches = bf.knnMatch(des1, des2, k = 1500)
         for match in matches:
             for m in match:
                 dist_value = m.distance
