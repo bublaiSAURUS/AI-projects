@@ -40,7 +40,7 @@ class VisionTasks(VisionTasksBase):
         for match in matches:
             for m in match:
                 dist_value = m.distance
-                if dist_value <= threshold:
+                if dist_value < threshold:
                     best_keypoint.append(m)
             best_match.append(best_keypoint)
             best_keypoint = []
