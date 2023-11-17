@@ -101,7 +101,7 @@ class VisionTasks(VisionTasksBase):
         for match in matches:
             feature_1 = match[0]
             feature_2 = match[1]
-            if feature_1.distance <= feature_2.distance*threshold:
+            if feature_1.distance < feature_2.distance*threshold:
                 best_keypoint.append(feature_1)
             best_match.append(best_keypoint)
             best_keypoint = []
