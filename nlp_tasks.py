@@ -32,7 +32,25 @@ class NLPTasks(NLPTasksBase):
         :return: preprocessed lines
         :rtype:  list[str]
         """
-        return []
+        ans = []
+        for text in texts:
+            ans.append(self.preprocessLine(text))
+        #print(ans)
+        return ans
+    
+    def preprocessLine(self, texts):
+        line = texts
+        punctuation_removed = re.findall(r'\b\w+\b', line) 
+        words_to_lowerCase = [word.lower() for word in punctuation_removed]
+        #stop_words = []
+        with open('stopwords_en.txt', 'r') as file:
+            stop_words = set(file.read().split())
+        filtered_list = [word for word in words_to_lowerCase if word not in stop_words]
+        if self.stemmer != None:
+            filtered_list = self.stemmer.stemWords(filtered_list)
+        joined = ' '.join(filtered_list)
+        #print(joined)
+        return joined
 
     def calc_IDF(self, term):
         """Calculates Inverse Document Frequency (IDF)
@@ -44,7 +62,15 @@ class NLPTasks(NLPTasksBase):
         :return: IDF
         :rtype:  float
         """
-        return 0.0
+        df = 0
+        #print(self.preprocessed_corpus)
+        for i in self.preprocessed_corpus:
+            #print(i)
+            if term in i:
+                df+=1
+        N = len(self.preprocessed_corpus)
+        IDF = math.log10((N-df+0.5)/(df+0.5))
+        return IDF
 
     def calc_BM25_score(self, index):
         """Calculates BM25 score
@@ -56,7 +82,33 @@ class NLPTasks(NLPTasksBase):
         :return: BM25
         :rtype:  float
         """
-        return 0.0
+        d = self.preprocessed_corpus[index]
+        q = self.preprocessed_question
+        d_length = len(d.split())
+        #print(d_length)
+        bm25_score = 0
+        #print(q)
+        #print(len(q))
+        #print(d)
+        sum = 0
+        for w in self.preprocessed_corpus:
+            #print(w)
+            #print(w.split())
+            #print(len(w.split()))
+            sum = sum + len(w.split())
+        #print(sum)
+        #print(len(self.preprocessed_corpus))
+        L = sum/len(self.preprocessed_corpus)
+        #print(L)
+        for qi in q.split():
+            #print(qi)
+            tf_qi = d.split().count(qi)
+            #print(tf_qi)
+            idf = self.get_IDF(qi)
+            numerator = (tf_qi)*3
+            denominator = (tf_qi)+2*(0.25+(0.75*(d_length/L)))
+            bm25_score += idf*(numerator/denominator)
+        return bm25_score
 
     def find_top_matches(self, n):
         """Finds the top scoring documents
@@ -68,7 +120,16 @@ class NLPTasks(NLPTasksBase):
         :return: top scoring original documents
         :rtype:  list[str]
         """
-        return []
+        corpus = self.preprocessed_corpus
+        question = self.preprocessed_question
+        ans = []
+        scores = [self.get_BM25_score(question, i) for i in range(len(corpus))]
+        ranked_docs = sorted(enumerate(scores), key=lambda x: x[1], reverse=True)
+        ans = []
+        for item in ranked_docs:
+            #ans.append(self.original_corpus(item[0]))
+            ans.append(self.original_corpus[item[0]])
+        return ans[:n]
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
