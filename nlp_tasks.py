@@ -66,7 +66,8 @@ class NLPTasks(NLPTasksBase):
         #print(self.preprocessed_corpus)
         for i in self.preprocessed_corpus:
             #print(i)
-            if term in i:
+            l = i.split()
+            if term in l:
                 df+=1
         N = len(self.preprocessed_corpus)
         IDF = math.log10((N-df+0.5)/(df+0.5))
